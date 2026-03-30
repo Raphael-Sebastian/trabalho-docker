@@ -1,0 +1,17 @@
+docker network create mural-rede = comando para criar a rede chamada mural-rede para comunicar entre os containers.
+--------------------------------------------------------------------------------------------------------
+docker volume create mural-db-data = comando para criar um volume para salvar os dados do banco.
+--------------------------------------------------------------------------------------------------------
+docker run -d --name mural-db --network mural-rede -e POSTGRES_USER=mural_user -e POSTGRES_PASSWORD=mural_pass -e POSTGRES_DB=mural_db -v mural-db-data:/var/lib/postgresql/data -v ${PWD}/db/init.sql:/docker-entrypoint-initdb.d/init.sql postgres:15 = comando para subir o container do banco PostgreSQL com usuário, senha, banco, volume e script para iniciar.
+--------------------------------------------------------------------------------------------------------
+docker build -t mural-backend:v1 ./backend = comando paa criar a imagem do backend a partir da pasta backend.
+--------------------------------------------------------------------------------------------------------
+docker run -d --name mural-backend --network mural-rede -p 5000:5000 -e DB_HOST=mural-db -e DB_NAME=mural_db -e DB_USER=mural_user -e DB_PASSWORD=mural_pass mural-backend:v1 = comando para subir o container do backend conectado ao banco e utilizando a porta 5000.
+--------------------------------------------------------------------------------------------------------
+docker build --build-arg REACT_APP_API_URL=http://localhost:5000 -t mural-frontend:v1 ./frontend = comando para criar a imagem do frontend passando a URL do backend no build.
+--------------------------------------------------------------------------------------------------------
+docker run -d --name mural-frontend --network mural-rede -p 8080:80 mural-frontend:v1 = comando para subir o container do frontend e mapear a porta 8080 do computador para o container
+--------------------------------------------------------------------------------------------------------
+docker ps = comando para lista os containers em execução.
+--------------------------------------------------------------------------------------------------------
+docker logs mural-backend = comando para visualizar os logs do backend e verificar se está funcionando.
